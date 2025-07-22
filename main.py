@@ -1,14 +1,13 @@
 from fastapi import FastAPI, Request, UploadFile, File, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from starlette.middleware.cors import CORSMiddleware
 from PIL import Image
-import io
-import base64
+import io, base64, os
 
 app = FastAPI()
 
-# Allow CORS (required if JS runs on different domain)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,29 +16,31 @@ app.add_middleware(
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
-async def serve_index():
-    with open("index.html", "r", encoding="utf-8") as f:
-        return f.read()
+async def serve_index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/convert/", response_class=HTMLResponse)
-async def convert(file: UploadFile = File(...), conversion: str = Form(...)):
+async def convert(request: Request, file: UploadFile = File(...), conversion: str = Form(...)):
     try:
         image_bytes = await file.read()
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
 
-        # Dummy transformation: convert to grayscale
+        # Dummy transformation
         image = image.convert("L").convert("RGB")
 
         buffer = io.BytesIO()
         image.save(buffer, format="JPEG")
         img_str = base64.b64encode(buffer.getvalue()).decode()
 
-        return f"""
-        <html><body>
-            <img src="data:image/jpeg;base64,{img_str}" />
-        </body></html>
-        """
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "result_image": f"data:image/jpeg;base64,{img_str}",
+        })
     except Exception as e:
-        return HTMLResponse(f"<h2>Error: {str(e)}</h2>", status_code=500)
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "error": str(e),
+        })
