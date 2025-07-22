@@ -1,85 +1,78 @@
 <!DOCTYPE html>
-<html class="scroll-smooth" lang="en">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Face Aging AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Tailwind CSS CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col items-center justify-start py-12">
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center px-4 py-10">
 
-  <h1 class="text-4xl font-bold mb-8">👵 Face Aging AI Demo</h1>
+  <h1 class="text-4xl font-bold mb-8 text-center">Face Aging AI</h1>
 
-  <form id="uploadForm" class="w-full max-w-xl space-y-6 bg-white p-8 rounded-2xl shadow-lg" enctype="multipart/form-data">
+  <form id="uploadForm" class="bg-white shadow-lg rounded-xl p-8 w-full max-w-xl space-y-6" enctype="multipart/form-data">
     <div>
-      <label for="fileInput" class="block text-xl font-semibold mb-2">Upload Face Image</label>
-      <input id="fileInput" name="file" type="file" accept="image/*" required
-             class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer" />
-      <p class="text-sm text-gray-500 mt-1">JPG or PNG, Max 5MB</p>
+      <label class="block text-lg font-semibold mb-2">Upload Face Image</label>
+      <input type="file" id="fileInput" name="file" accept="image/*" required class="w-full border rounded-lg p-2" />
     </div>
 
     <div>
-      <label for="conversion" class="block text-xl font-semibold mb-2">Choose Transformation</label>
-      <select id="conversion" name="conversion" required class="w-full p-3 rounded-lg border">
+      <label for="conversion" class="block text-lg font-semibold mb-2">Transformation Type</label>
+      <select id="conversion" name="conversion" required class="w-full border rounded-lg p-2">
         <option value="young_to_old">Young to Old</option>
         <option value="old_to_young">Old to Young</option>
       </select>
     </div>
 
-    <button type="submit" class="w-full bg-brown-700 hover:bg-brown-800 text-white font-bold py-3 rounded-xl text-lg">
-      🔄 Generate
+    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+      Generate
     </button>
   </form>
 
-  <div id="loading" class="mt-8 text-lg text-blue-600 hidden">Processing image... Please wait.</div>
-  <div id="result" class="mt-8 w-full max-w-xl text-center">
-    <img id="outputImage" class="rounded-2xl shadow-md w-full hidden" alt="Result Image" loading="lazy" />
-    <p id="errorMsg" class="text-red-500 mt-4"></p>
+  <div id="resultSection" class="mt-10 text-center hidden">
+    <h2 class="text-2xl font-semibold mb-4">Result:</h2>
+    <img id="outputImage" src="#" alt="Transformed Face" class="rounded-xl shadow-md mx-auto max-w-xs" />
   </div>
+
+  <p id="errorMsg" class="text-red-600 mt-6"></p>
 
   <script>
     const form = document.getElementById('uploadForm');
     const outputImage = document.getElementById('outputImage');
+    const resultSection = document.getElementById('resultSection');
     const errorMsg = document.getElementById('errorMsg');
-    const loading = document.getElementById('loading');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorMsg.textContent = "";
-      outputImage.style.display = 'none';
-      loading.style.display = 'block';
+      resultSection.classList.add("hidden");
 
       const formData = new FormData(form);
 
       try {
         const response = await fetch("/convert/", {
           method: "POST",
-          body: formData
+          body: formData,
         });
 
         if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
+          const errText = await response.text();
+          throw new Error(errText);
         }
 
-        const html = await response.text();
-        console.log("🟢 HTML response received from /convert");
+        const data = await response.json();
 
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-        const img = doc.querySelector("img");
-
-        if (img && img.src) {
-          outputImage.src = img.src;
-          outputImage.style.display = 'block';
-        } else {
-          throw new Error("❌ No image found in server response.");
+        if (data.error) {
+          throw new Error(data.error);
         }
-      } catch (err) {
-        console.error(err);
-        errorMsg.textContent = "⚠️ Upload failed: " + err.message;
-      } finally {
-        loading.style.display = 'none';
+
+        outputImage.src = `data:image/png;base64,${data.image}`;
+        resultSection.classList.remove("hidden");
+        console.log("✅ Image received and shown");
+
+      } catch (error) {
+        console.error("❌ Error:", error);
+        errorMsg.textContent = error.message || "Something went wrong.";
       }
     });
   </script>
