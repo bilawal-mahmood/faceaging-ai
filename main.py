@@ -54,3 +54,10 @@ async def convert_image(file: UploadFile = File(...), conversion: str = Form(...
     base64_img = base64.b64encode(buffer).decode("utf-8")
 
     return {"image": base64_img}
+if __name__ == "__main__":
+    import os
+    port = int(os.environ.get("PORT", 10000))
+    # Bind to 0.0.0.0 and the dynamic port
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=port)
+
