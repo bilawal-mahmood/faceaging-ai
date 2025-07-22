@@ -1,17 +1,20 @@
-from fastapi import FastAPI, File, UploadFile, Form
+from fastapi import FastAPI, File, UploadFile, Form, Request
 from fastapi.responses import HTMLResponse
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
+
+from helper import extract_faces_opencv, generate_Y2O, generate_O2Y
+
 from PIL import Image
+import numpy as np
 import io
 import cv2
-import numpy as np
 import base64
-from helper import extract_faces_opencv, generate_Y2O, generate_O2Y
 
 app = FastAPI()
 
-# CORS for JS frontend
+# Allow frontend to make requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,43 +22,45 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+# Mount static files and templates
 app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
 
 @app.get("/", response_class=HTMLResponse)
-async def serve_index():
-    with open("static/index.html", "r", encoding="utf-8") as f:
-        return f.read()
+def serve_index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
-@app.post("/convert/", response_class=HTMLResponse)
-async def convert(file: UploadFile = File(...), conversion: str = Form(...)):
+
+@app.post("/convert/")
+async def convert_image(file: UploadFile = File(...), conversion: str = Form(...)):
+    contents = await file.read()
+
     try:
-        contents = await file.read()
         image = Image.open(io.BytesIO(contents)).convert("RGB")
         image_np = np.array(image)
 
+        # Detect face
         faces = extract_faces_opencv(image_np)
         if not faces:
-            return HTMLResponse("<h2>No face detected</h2>", status_code=400)
+            return {"error": "No face detected in image."}
 
         face = cv2.resize(faces[0], (256, 256))
 
+        # Apply model based on conversion type
         if conversion == "young_to_old":
             result = generate_Y2O(face)
         elif conversion == "old_to_young":
             result = generate_O2Y(face)
         else:
-            return HTMLResponse("<h2>Invalid conversion type</h2>", status_code=400)
+            return {"error": "Invalid conversion type"}
 
-        # Convert model result to image
+        # Convert to base64 for frontend
         result_img = (result * 255).astype(np.uint8)
-        _, buffer = cv2.imencode(".png", result_img[:, :, ::-1])  # Convert to RGB
-        img_str = base64.b64encode(buffer).decode("utf-8")
+        _, buffer = cv2.imencode(".png", result_img[:, :, ::-1])  # BGR → RGB
+        base64_img = base64.b64encode(buffer).decode("utf-8")
 
-        return f"""
-        <html><body>
-            <img src="data:image/png;base64,{img_str}" style="max-width:100%; border-radius:20px; box-shadow:0 4px 20px rgba(0,0,0,0.2);" />
-        </body></html>
-        """
+        return {"image": base64_img}
 
     except Exception as e:
-        return HTMLResponse(f"<h2>Error: {str(e)}</h2>", status_code=500)
+        return {"error": f"Processing error: {str(e)}"}
