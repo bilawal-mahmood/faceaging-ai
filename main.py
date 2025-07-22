@@ -1,15 +1,16 @@
-from fastapi import FastAPI, UploadFile, File, Form, Request
+from fastapi import FastAPI, Request, UploadFile, File, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from starlette.middleware.cors import CORSMiddleware
+from starlette.templating import Jinja2Templates
 from PIL import Image
 import io
 import base64
+import os
 
 app = FastAPI()
 
-# Allow CORS for any frontend to access
+# CORS for cross-origin requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,44 +18,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve static files and HTML templates
+# Static and templates
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-
 @app.get("/", response_class=HTMLResponse)
-async def serve_index(request: Request):
+async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-
 @app.post("/convert/", response_class=HTMLResponse)
-async def convert_image(
-    request: Request,
-    file: UploadFile = File(...),
-    conversion: str = Form(...)
-):
+async def convert(file: UploadFile = File(...), conversion: str = Form(...)):
     try:
-        # Read uploaded image
-        contents = await file.read()
-        image = Image.open(io.BytesIO(contents)).convert("RGB")
+        image_bytes = await file.read()
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
 
-        # Simulated conversion (grayscale)
-        if conversion == "grayscale":
-            image = image.convert("L").convert("RGB")
+        # Dummy transformation: Grayscale
+        image = image.convert("L").convert("RGB")
 
-        # Convert image to base64
         buffer = io.BytesIO()
         image.save(buffer, format="JPEG")
-        img_base64 = base64.b64encode(buffer.getvalue()).decode()
+        img_str = base64.b64encode(buffer.getvalue()).decode()
 
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "result_image": f"data:image/jpeg;base64,{img_base64}",
-            "success": True
-        })
-
+        html = f"""
+        <html>
+        <body>
+            <img src="data:image/jpeg;base64,{img_str}" />
+        </body>
+        </html>
+        """
+        return HTMLResponse(content=html)
     except Exception as e:
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "error": str(e)
-        })
+        print(f"❌ ERROR: {e}")
+        return HTMLResponse(content=f"<h2>Error: {str(e)}</h2>", status_code=500)
