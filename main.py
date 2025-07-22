@@ -1,5 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, Form
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,39 +11,73 @@ import numpy as np
 import io, cv2, base64, os
 
 app = FastAPI()
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+# Allow CORS for frontend to access backend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+# Serve static files (e.g., CSS, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 
+# Handle HEAD request for Render health check
+@app.head("/")
+async def head_root():
+    return Response(status_code=200)
+
+
+# Home page
 @app.get("/", response_class=HTMLResponse)
 def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request,
-                                                     "result": None,
-                                                     "error": None,
-                                                     "log": ""})
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "result": None,
+        "error": None,
+        "log": ""
+    })
 
 
+# Face conversion endpoint
 @app.post("/convert/", response_class=HTMLResponse)
-async def convert_image(request: Request, file: UploadFile = File(...), conversion: str = Form(...)):
+async def convert_image(
+    request: Request,
+    file: UploadFile = File(...),
+    conversion: str = Form(...)
+):
     log_msgs = []
     log_msgs.append("🟢 Received upload")
 
     contents = await file.read()
     log_msgs.append(f"Loaded file: {file.filename}, size {len(contents)} bytes")
+
     try:
         image = Image.open(io.BytesIO(contents)).convert("RGB")
         image_np = np.array(image)
         log_msgs.append("Converted to numpy array")
     except Exception as e:
         log_msgs.append(f"❌ Error loading image: {e}")
-        return templates.TemplateResponse("index.html", {"request": request, "result": None, "error": "Invalid image file", "log": "\\n".join(log_msgs)})
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "result": None,
+            "error": "Invalid image file",
+            "log": "\n".join(log_msgs)
+        })
 
     faces = extract_faces_opencv(image_np)
     log_msgs.append(f"Faces detected: {len(faces)}")
 
     if not faces:
-        return templates.TemplateResponse("index.html", {"request": request, "result": None, "error": "No face detected", "log": "\\n".join(log_msgs)})
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "result": None,
+            "error": "No face detected",
+            "log": "\n".join(log_msgs)
+        })
 
     face = cv2.resize(faces[0], (256, 256))
     log_msgs.append("Resized face to 256x256")
@@ -56,20 +90,28 @@ async def convert_image(request: Request, file: UploadFile = File(...), conversi
         log_msgs.append(f"Applied model: {conversion}")
     except Exception as e:
         log_msgs.append(f"❌ Error during model processing: {e}")
-        return templates.TemplateResponse("index.html", {"request": request, "result": None, "error": "Processing error", "log": "\\n".join(log_msgs)})
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "result": None,
+            "error": "Processing error",
+            "log": "\n".join(log_msgs)
+        })
 
     result_img = (result * 255).astype(np.uint8)
     _, buffer = cv2.imencode(".png", result_img[:, :, ::-1])
     base64_img = base64.b64encode(buffer).decode("utf-8")
     log_msgs.append("Generated base64 image result")
 
-    full_log = "\\n".join(log_msgs)
-    return templates.TemplateResponse("index.html", {"request": request,
-                                                     "result": base64_img,
-                                                     "error": None,
-                                                     "log": full_log})
+    full_log = "\n".join(log_msgs)
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "result": base64_img,
+        "error": None,
+        "log": full_log
+    })
 
 
+# Only runs if started directly (local dev)
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     import uvicorn
