@@ -10,6 +10,7 @@ import numpy as np
 import io
 import cv2
 import base64
+import os
 
 app = FastAPI()
 
@@ -56,5 +57,5 @@ async def convert_image(file: UploadFile = File(...), conversion: str = Form(...
     return {"image": base64_img}
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 8000))  # Render provides PORT
+    uvicorn.run(app, host="0.0.0.0", port=port)  # Must bind to 0.0.0.0
