@@ -1,80 +1,775 @@
-<!DOCTYPE html>
-<html lang="en">
+<html class="scroll-smooth" lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Face Aging AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>FaceAging AI - AI-Powered Face Age Transformation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #faf9f6;
+            color: #3e2723;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            min-height: 100vh;
+        }
+
+        body.dark {
+            background-color: #6d4c41;
+            color: #d7ccc8;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #a1887f;
+            border-radius: 4px;
+        }
+
+        body.dark ::-webkit-scrollbar-thumb {
+            background-color: #5d4037;
+        }
+
+        header.scrolled {
+            box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
+            backdrop-filter: saturate(180%) blur(10px);
+            background-color: rgba(250, 249, 246, 0.85);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.dark header.scrolled {
+            background-color: rgba(109, 76, 65, 0.9);
+            box-shadow: 0 2px 12px rgb(0 0 0 / 0.5);
+        }
+
+        #darkToggle {
+            cursor: pointer;
+            transition: transform 0.3s ease, color 0.3s ease;
+            color: #3e2723;
+        }
+
+        #darkToggle:hover,
+        #darkToggle:focus {
+            transform: scale(1.1);
+            outline: none;
+            color: #ff7043;
+        }
+
+        body.dark #darkToggle {
+            color: #d7ccc8;
+        }
+
+        body.dark #darkToggle:hover,
+        body.dark #darkToggle:focus {
+            color: #ffccbc;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .scroll-animate.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        button.primary-btn {
+            background-color: #6d4c41;
+            color: #faf9f6;
+            box-shadow: 0 4px 8px rgb(109 76 65 / 0.5);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease,
+                transform 0.15s ease, color 0.3s ease;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+
+        button.primary-btn:hover,
+        button.primary-btn:focus {
+            background-color: #4e342e;
+            box-shadow: 0 6px 12px rgb(78 52 46 / 0.7);
+            outline: none;
+            transform: scale(1.05);
+            color: #ffccbc;
+        }
+
+        .feature-card,
+        .step-card {
+            background-color: #ffccbc;
+            border-radius: 1rem;
+            box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+            transition: box-shadow 0.3s ease, transform 0.3s ease,
+                background-color 0.3s ease;
+            cursor: default;
+            color: #4e342e;
+        }
+
+        .feature-card:hover,
+        .feature-card:focus-within,
+        .step-card:hover,
+        .step-card:focus-within {
+            box-shadow: 0 8px 20px rgb(109 76 65 / 0.3);
+            transform: translateY(-6px);
+            outline: none;
+            background-color: #ffab91;
+            color: #3e2723;
+        }
+
+        .image-container {
+            border-radius: 1rem;
+            box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
+            overflow: hidden;
+            background-color: #fff7f3;
+            position: relative;
+        }
+
+        .image-container img {
+            opacity: 0;
+            transition: opacity 1s ease;
+            display: block;
+            width: 100%;
+            height: auto;
+            user-select: none;
+            pointer-events: none;
+            border-radius: 1rem;
+        }
+
+        .image-container img.loaded {
+            opacity: 1;
+        }
+
+        .spinner {
+            border: 4px solid #e0d7d1;
+            border-top: 4px solid #6d4c41;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+            margin: auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .upload-area {
+            border: 2px dashed #d7ccc8;
+            border-radius: 1rem;
+            background-color: #fff7f3;
+            transition: background-color 0.3s ease, border-color 0.3s ease,
+                color 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            text-align: center;
+            color: #6d4c41;
+            user-select: none;
+            outline-offset: 4px;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            background-color: #ffebe6;
+            border-color: #6d4c41;
+            color: #4e342e;
+        }
+
+        body.dark .upload-area {
+            background-color: #4e342e;
+            color: #ffccbc;
+            border-color: #a1887f;
+        }
+
+        body.dark .upload-area:hover,
+        body.dark .upload-area.dragover {
+            background-color: #3e2723;
+            border-color: #ffab91;
+            color: #ffccbc;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .upload-label {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-top: 1rem;
+            color: inherit;
+            user-select: none;
+        }
+
+        .before-after-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+            box-shadow: 0 8px 24px rgb(0 0 0 / 0.1);
+            background-color: #fff7f3;
+            max-width: 100%;
+            user-select: none;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .before-image,
+        .after-image {
+            display: block;
+            width: 48%;
+            height: auto;
+            pointer-events: none;
+            user-select: none;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+            transition: opacity 1s ease;
+        }
+
+        @media (max-width: 768px) {
+            .before-after-container {
+                flex-direction: column;
+            }
+
+            .before-image,
+            .after-image {
+                width: 100%;
+            }
+
+            .upload-area {
+                padding: 2rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .before-after-container {
+                max-height: none;
+            }
+
+            .upload-area {
+                padding: 1.5rem 1rem;
+            }
+        }
+
+        .features-grid,
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        #learnMoreContent {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+            color: #6d4c41;
+        }
+
+        #learnMoreContent.open {
+            max-height: 500px;
+        }
+
+        .learn-more-btn {
+            color: #6d4c41;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.3s ease;
+        }
+
+        .learn-more-btn:hover,
+        .learn-more-btn:focus {
+            color: #4e342e;
+            outline: none;
+        }
+
+        ul li a {
+            transition: color 0.3s ease;
+        }
+
+        ul li a:hover,
+        ul li a:focus {
+            color: #6d4c41;
+            outline: none;
+        }
+
+        footer {
+            color: #6d4c41;
+        }
+
+        footer a {
+            color: #6d4c41;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover,
+        footer a:focus {
+            color: #4e342e;
+            outline: none;
+        }
+
+        form#uploadForm {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        form#uploadForm select,
+        form#uploadForm button {
+            width: 100%;
+            border-radius: 0.5rem;
+            border: 1.5px solid #6d4c41;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #3e2723;
+            background-color: #fff7f3;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        form#uploadForm select:focus,
+        form#uploadForm button:focus {
+            outline: none;
+            border-color: #4e342e;
+            background-color: #ffebe6;
+        }
+
+        form#uploadForm button {
+            background-color: #6d4c41;
+            color: #faf9f6;
+            box-shadow: 0 4px 8px rgb(109 76 65 / 0.5);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease,
+                transform 0.15s ease, color 0.3s ease;
+        }
+
+        form#uploadForm button:hover,
+        form#uploadForm button:focus {
+            background-color: #4e342e;
+            box-shadow: 0 6px 12px rgb(78 52 46 / 0.7);
+            color: #ffccbc;
+            transform: scale(1.05);
+            outline: none;
+        }
+
+        form#uploadForm input[type="file"] {
+            cursor: pointer;
+            border-radius: 0.5rem;
+            border: 1.5px solid #6d4c41;
+            padding: 0.5rem 1rem;
+            background-color: #fff7f3;
+            color: #3e2723;
+            font-weight: 600;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            width: 100%;
+            display: block;
+        }
+
+        form#uploadForm input[type="file"]:focus {
+            outline: none;
+            border-color: #4e342e;
+            background-color: #ffebe6;
+        }
+
+        #result {
+            margin-top: 2rem;
+            text-align: center;
+            color: #3e2723;
+        }
+
+        #result h2 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        #outputImage {
+            max-width: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
+            display: none;
+            margin: 0 auto;
+        }
+
+        body.dark form#uploadForm select,
+        body.dark form#uploadForm button,
+        body.dark form#uploadForm input[type="file"] {
+            background-color: #4e342e;
+            color: #ffccbc;
+            border-color: #a1887f;
+        }
+
+        body.dark form#uploadForm select:focus,
+        body.dark form#uploadForm button:focus,
+        body.dark form#uploadForm input[type="file"]:focus {
+            background-color: #3e2723;
+            border-color: #ffab91;
+            color: #ffccbc;
+        }
+
+        body.dark #result {
+            color: #d7ccc8;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center px-4 py-10">
 
-  <h1 class="text-4xl font-bold mb-8 text-center">Face Aging AI</h1>
+<body class="relative flex flex-col min-h-screen transition-colors duration-500">
+    <!-- HEADER -->
+    <header class="fixed top-0 left-0 right-0 z-50 border-b border-transparent backdrop-blur-sm" id="header"
+        role="banner" style="background-color: rgba(250, 249, 246, 0.85)">
+        <nav aria-label="Primary Navigation"
+            class="max-w-7xl mx-auto flex items-center justify-between px-6 sm:px-8 lg:px-12 h-16">
+            <a aria-label="FaceAging AI Home" class="flex items-center space-x-3 font-semibold text-xl select-none"
+                href="#" style="color: #3e2723">
+                <img alt="FaceAging AI logo, stylized FA letters in circle" aria-hidden="true"
+                    class="w-10 h-10 rounded-full" draggable="false" height="40"
+                    src="https://storage.googleapis.com/a1aa/image/02d7a33c-afc0-4d71-885c-1ebc483270ab.jpg"
+                    width="40" />
+                <span class="font-inter font-bold tracking-wide">FaceAging AI</span>
+            </a>
+            <ul class="hidden md:flex space-x-10 font-medium text-brown" role="menubar" style="color: #3e2723">
+                <li role="none">
+                    <a class="hover:text-[#6D4C41] focus:outline-none focus:text-[#6D4C41]" href="#about"
+                        role="menuitem" tabindex="0">About</a>
+                </li>
+                <li role="none">
+                    <a class="hover:text-[#6D4C41] focus:outline-none focus:text-[#6D4C41]" href="#features"
+                        role="menuitem" tabindex="0">Features</a>
+                </li>
+                <li role="none">
+                    <a class="hover:text-[#6D4C41] focus:outline-none focus:text-[#6D4C41]" href="#tryItOut"
+                        role="menuitem" tabindex="0">Try It Out</a>
+                </li>
+                <li role="none">
+                    <a class="hover:text-[#6D4C41] focus:outline-none focus:text-[#6D4C41]" href="#contact"
+                        role="menuitem" tabindex="0">Contact</a>
+                </li>
+            </ul>
+            <div class="flex items-center space-x-4">
+                <button aria-label="Toggle dark mode"
+                    class="focus:outline-none focus:ring-2 focus:ring-[#FF7043] rounded p-1 " id="darkToggle"
+                    title="Toggle dark mode" type="button" style="color: #3e2723; visibility: hidden;">
+                    <i class="fas fa-moon fa-lg"></i>
+                </button>
+                <!-- Mobile menu button -->
+                <button aria-controls="mobileMenu" aria-expanded="false" aria-label="Toggle menu"
+                    class="md:hidden focus:outline-none focus:ring-2 focus:ring-[#FF7043] rounded p-1"
+                    id="mobileMenuButton" type="button" style="color: #3e2723">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+            </div>
+        </nav>
+        <!-- Mobile menu -->
+        <div aria-label="Mobile Navigation" class="hidden md:hidden border-t border-transparent" id="mobileMenu"
+            role="menu" style="background-color: rgba(250, 249, 246, 0.95)">
+            <ul class="flex flex-col space-y-2 p-4 font-medium" style="color: #3e2723">
+                <li role="none">
+                    <a class="block px-3 py-2 rounded hover:bg-[#FFEBE6] hover:text-[#6D4C41] focus:outline-none focus:bg-[#FFEBE6] focus:text-[#6D4C41] transition"
+                        href="#about" role="menuitem" tabindex="0">About</a>
+                </li>
+                <li role="none">
+                    <a class="block px-3 py-2 rounded hover:bg-[#FFEBE6] hover:text-[#6D4C41] focus:outline-none focus:bg-[#FFEBE6] focus:text-[#6D4C41] transition"
+                        href="#features" role="menuitem" tabindex="0">Features</a>
+                </li>
+                <li role="none">
+                    <a class="block px-3 py-2 rounded hover:bg-[#FFEBE6] hover:text-[#6D4C41] focus:outline-none focus:bg-[#FFEBE6] focus:text-[#6D4C41] transition"
+                        href="#tryItOut" role="menuitem" tabindex="0">Try It Out</a>
+                </li>
+                <li role="none">
+                    <a class="block px-3 py-2 rounded hover:bg-[#FFEBE6] hover:text-[#6D4C41] focus:outline-none focus:bg-[#FFEBE6] focus:text-[#6D4C41] transition"
+                        href="#contact" role="menuitem" tabindex="0">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </header>
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow pt-20">
+        <!-- HERO -->
+        <section class="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 text-center py-20 fade-in" id="hero" tabindex="-1">
+            <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight max-w-3xl mx-auto" style="color: #3e2723">
+                FaceAging AI
+            </h1>
+            <p class="mt-4 text-lg sm:text-xl max-w-2xl mx-auto" style="color: #6d4c41">
+                Realistic AI-powered face age transformation — look older or younger
+                instantly.
+            </p>
+            <button aria-label="Upload Image"
+                class="primary-btn mt-10 px-8 py-4 text-lg rounded-lg shadow-lg focus:outline-none focus:ring-4 focus:ring-[#FF7043]"
+                id="uploadBtnHero" type="button">
+                <i class="fas fa-upload mr-3"></i> Upload Image
+            </button>
+        </section>
 
-  <form id="uploadForm" class="bg-white shadow-lg rounded-xl p-8 w-full max-w-xl space-y-6" enctype="multipart/form-data">
-    <div>
-      <label class="block text-lg font-semibold mb-2">Upload Face Image</label>
-      <input type="file" id="fileInput" name="file" accept="image/*" required class="w-full border rounded-lg p-2" />
+       
+<!-- TRY IT OUT -->
+<section aria-label="Try FaceAging AI"
+  class="max-w-full mx-auto px-12 sm:px-20 lg:px-28 py-20 scroll-animate"
+  id="tryItOut" tabindex="-1">
+
+  <form class="space-y-10 max-w-5xl mx-auto" id="uploadForm" enctype="multipart/form-data" novalidate>
+
+    <!-- Upload Box -->
+    <div class="border-2 border-dashed border-[#A1887F] rounded-3xl p-14 text-center bg-[#EFEBE9] shadow-md">
+      <label for="fileInput" class="block text-3xl font-semibold text-[#3E2723] mb-6">
+        Upload Your Face Image
+      </label>
+      <input accept="image/*" class="block mx-auto text-lg mb-5 w-full max-w-4xl" id="fileInput" name="file" required
+        type="file" aria-label="Upload face image" />
+      <p class="text-base text-[#5D4037]">Supported formats: JPG, PNG • Max size: 5MB</p>
     </div>
 
-    <div>
-      <label for="conversion" class="block text-lg font-semibold mb-2">Transformation Type</label>
-      <select id="conversion" name="conversion" required class="w-full border rounded-lg p-2">
-        <option value="young_to_old">Young to Old</option>
-        <option value="old_to_young">Old to Young</option>
-      </select>
-    </div>
+    <!-- Controls Section -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-10 max-w-5xl mx-auto">
 
-    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
-      Generate
-    </button>
+      <!-- Dropdown -->
+      <div class="w-full sm:w-1/2">
+        <label for="conversion" class="block text-lg font-medium text-[#3E2723] mb-3">
+          Choose Transformation
+        </label>
+        <select id="conversion" name="conversion" required
+          class="w-full px-6 py-4 rounded-3xl border border-[#A1887F] bg-white text-[#3E2723] text-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-[#6D4C41] transition">
+          <option value="young_to_old">Young to Old</option>
+          <option value="old_to_young">Old to Young</option>
+        </select>
+      </div>
+
+      <!-- Generate Button -->
+      <div class="w-full sm:w-1/3 mt-6 sm:mt-0">
+        <button id="generateBtn" type="submit"
+          class="primary-btn w-full sm:w-auto px-8 py-4 bg-[#6D4C41] text-white font-semibold text-xl rounded-3xl shadow-md hover:bg-[#5D4037] transition focus:outline-none focus:ring-6 focus:ring-[#6D4C41]"
+          aria-label="Generate aged or de-aged face image">
+          Generate
+        </button>
+      </div>
+
+    </div>
   </form>
 
-  <div id="resultSection" class="mt-10 text-center hidden">
-    <h2 class="text-2xl font-semibold mb-4">Result:</h2>
-    <img id="outputImage" src="#" alt="Transformed Face" class="rounded-xl shadow-md mx-auto max-w-xs" />
+  <!-- Result -->
+  <div id="result" class="mt-20 text-center max-w-6xl mx-auto">
+    <h2 class="text-3xl font-bold mb-8 text-[#3e2723]">Result:</h2>
+    <img alt="Result Image showing the face after aging or de-aging transformation"
+      class="mx-auto rounded-3xl shadow-lg max-w-full" id="outputImage" src="#" style="display: none" loading="lazy" />
   </div>
+</section>
 
-  <p id="errorMsg" class="text-red-600 mt-6"></p>
 
-  <script>
-    const form = document.getElementById('uploadForm');
-    const outputImage = document.getElementById('outputImage');
-    const resultSection = document.getElementById('resultSection');
-    const errorMsg = document.getElementById('errorMsg');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      errorMsg.textContent = "";
-      resultSection.classList.add("hidden");
 
-      const formData = new FormData(form);
+        <!-- AI INSIGHT PANEL -->
+        <section aria-label="AI Insight Panel"
+            class="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-16 scroll-animate bg-[#FFCCBC] rounded-3xl shadow-lg mt-20"
+            id="aiInsight" tabindex="-1" style="color: #4e342e">
+            <h2 class="text-3xl font-extrabold mb-6 select-none" style="color: #6d4c41">
+                AI Insight
+            </h2>
+            <p class="max-w-3xl leading-relaxed">
+                FaceAging AI leverages state-of-the-art deep learning models trained on
+                diverse datasets to realistically simulate aging and de-aging effects on
+                facial images. Our proprietary algorithms ensure natural,
+                high-fidelity transformations while preserving your unique features.
+            </p>
+            <button aria-controls="learnMoreContent" aria-expanded="false"
+                class="mt-4 learn-more-btn font-semibold rounded focus:ring-2 focus:ring-[#6D4C41]" id="learnMoreBtn"
+                type="button">
+                Learn More
+            </button>
+            <div class="mt-4 max-w-3xl overflow-hidden" hidden id="learnMoreContent" style="color: #6d4c41">
+                <p class="mb-3">
+                    Our AI pipeline includes advanced face detection, landmark alignment,
+                    and generative adversarial networks (GANs) fine-tuned for age
+                    progression and regression. The model adapts to various lighting,
+                    angles, and ethnicities to provide consistent results.
+                </p>
+                <p>
+                    We prioritize user privacy by processing images securely and never
+                    storing personal data. The transformations happen in real-time,
+                    offering a seamless and engaging experience.
+                </p>
+            </div>
+        </section>
 
-      try {
-        const response = await fetch("/convert/", {
-          method: "POST",
-          body: formData,
-        });
+        <!-- ABOUT -->
+        <section aria-label="About FaceAging AI" class="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-16 scroll-animate"
+            id="about" tabindex="-1" style="color: #3e2723">
+            <h2 class="text-3xl font-extrabold mb-6 text-center select-none" style="color: #6d4c41">
+                About FaceAging AI
+            </h2>
+            <p class="max-w-3xl mx-auto leading-relaxed text-center">
+                <strong>FaceAging AI</strong> is a modern, AI-powered web application designed to transform facial
+                images by simulating realistic age progression and regression. Powered by cutting-edge deep learning
+                models and computer vision techniques, FaceAging AI allows users to visualize themselves at different
+                ages with high-quality, photorealistic results—directly through their browser.
+            </p>
+            <br />
+            <p class="max-w-3xl mx-auto leading-relaxed text-center">
+                Whether you're curious to see your older self or wish to recreate a youthful look, FaceAging AI provides
+                a secure, seamless, and intuitive experience. All uploaded images are handled with the utmost care and
+                privacy. The platform is designed to be fast, accessible, and user-friendly, requiring no advanced
+                technical skills to use.
+            </p>
+            <br />
+            <p class="max-w-3xl mx-auto leading-relaxed text-center">
+                This application was thoughtfully developed by <strong>Saksham Pathak</strong>, a passionate AI
+                researcher and developer currently pursuing a Master's degree in <strong>Artificial Intelligence and
+                    Machine Learning</strong> at <strong>IIIT Lucknow</strong>. With a strong foundation in AI
+                technologies and a commitment to building ethical and impactful digital solutions, Saksham created
+                FaceAging AI to demonstrate how artificial intelligence can be applied to enhance everyday digital
+                experiences in a safe and meaningful way.
+            </p>
+            <br />
+            <p class="max-w-3xl mx-auto leading-relaxed text-center">
+                Thank you for using FaceAging AI. We hope you enjoy exploring the possibilities of AI-powered facial
+                transformation. Your feedback is always welcome and appreciated.
+            </p>
+        </section>
 
-        if (!response.ok) {
-          const errText = await response.text();
-          throw new Error(errText);
-        }
-
-        const data = await response.json();
-
-        if (data.error) {
-          throw new Error(data.error);
-        }
-
-        outputImage.src = `data:image/png;base64,${data.image}`;
-        resultSection.classList.remove("hidden");
-        console.log("✅ Image received and shown");
-
-      } catch (error) {
-        console.error("❌ Error:", error);
-        errorMsg.textContent = error.message || "Something went wrong.";
-      }
-    });
-  </script>
+        <!-- FEATURES -->
+        <section aria-label="Features of FaceAging AI"
+            class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-16 scroll-animate" id="features" tabindex="-1">
+            <h2 class="text-3xl font-extrabold mb-10 text-center select-none" style="color: #3e2723">
+                Features
+            </h2>
+            <div class="features-grid">
+                <article aria-label="High accuracy feature" class="feature-card p-6 text-center focus:outline-none"
+                    tabindex="0">
+                    <i aria-hidden="true" class="fas fa-bullseye text-[#6D4C41] text-5xl mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2" style="color: #4e342e">
+                        High Accuracy
+                    </h3>
+                    <p>
+                        Our AI models deliver precise and realistic age transformations,
+                        preserving your unique facial features.
+                    </p>
+                </article>
+                <article aria-label="Fast processing feature" class="feature-card p-6 text-center focus:outline-none"
+                    tabindex="0">
+                    <i aria-hidden="true" class="fas fa-bolt text-[#6D4C41] text-5xl mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2" style="color: #4e342e">
+                        Fast Processing
+                    </h3>
+                    <p>
+                        Experience near-instant results with optimized AI pipelines and
+                        efficient cloud processing.
+                    </p>
+                </article>
+                <article aria-label="Seamless integration feature"
+                    class="feature-card p-6 text-center focus:outline-none" tabindex="0">
+                    <i aria-hidden="true" class="fas fa-plug text-[#6D4C41] text-5xl mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2" style="color: #4e342e">
+                        Seamless Integration
+                    </h3>
+                    <p>
+                        Easily embed FaceAging AI into your apps or websites with our
+                        flexible APIs and SDKs.
+                    </p>
+                </article>
+                <article aria-label="Privacy focused feature" class="feature-card p-6 text-center focus:outline-none"
+                    tabindex="0">
+                    <i aria-hidden="true" class="fas fa-user-shield text-[#6D4C41] text-5xl mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2" style="color: #4e342e">
+                        Privacy Focused
+                    </h3>
+                    <p>
+                        Your images are processed securely and never stored, ensuring your
+                        privacy and data protection.
+                    </p>
+                </article>
+            </div>
+        </section>
+        <!-- CONTACT -->
+        <section aria-label="Contact information" class="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-16 scroll-animate"
+            id="contact" tabindex="-1" style="color: #3e2723">
+            <h2 class="text-3xl font-extrabold mb-6 text-center select-none" style="color: #6d4c41">
+                Contact
+            </h2>
+            <p class="text-center max-w-3xl mx-auto mb-6" style="color: #4e342e">
+                Have questions or want to collaborate with us ? Reach out to us via email or
+                social media:
+            </p>
+            <ul class="flex flex-col sm:flex-row justify-center gap-8 text-lg max-w-3xl mx-auto" style="color: #3e2723">
+                <li class="flex items-center space-x-3">
+                    <i class="fas fa-envelope text-[#6D4C41] text-xl"></i>
+                    <a class="hover:text-[#4E342E] focus:outline-none focus:text-[#4E342E] transition"
+                        href="mailto:pathaksaksham430@gmail.com" tabindex="0">pathaksaksham430@gmail.com</a>
+                </li>
+                <li class="flex items-center space-x-3">
+                    <i class="fab fa-linkedin-in text-[#6D4C41] text-xl"></i>
+                    <a class="hover:text-[#4E342E] focus:outline-none focus:text-[#4E342E] transition"
+                        href="https://linkedin.com/in/sakshampathak" rel="noopener noreferrer" target="_blank"
+                        tabindex="0">linkedin.com/in/sakshampathak</a>
+                </li>
+                <li class="flex items-center space-x-3">
+                    <i class="fab fa-github text-[#6D4C41] text-xl"></i>
+                    <a class="hover:text-[#4E342E] focus:outline-none focus:text-[#4E342E] transition"
+                        href="https://github.com/parthmax2" rel="noopener noreferrer" target="_blank"
+                        tabindex="0">github.com/parthmax2</a>
+                </li>
+            </ul>
+        </section>
+    </main>
+    <!-- FOOTER -->
+    <footer class="border-t border-[#D7CCC8] py-8 px-6 sm:px-12 mt-20" role="contentinfo" style="color: #3e2723">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between space-y-6 sm:space-y-0">
+            <div class="flex space-x-6 text-2xl" style="color: #3e2723">
+                <a aria-label="Instagram"
+                    class="hover:text-[#6D4C41] focus:outline-none focus:text-[#6D4C41] transition"
+                    href="https://instagram.com/parthmax_" rel="noopener noreferrer" target="_blank" tabindex="0"><i
+                        class="fab fa-instagram"></i></a>
+                <a aria-label="LinkedIn" class="hover:text-[#6D4C41] focus:outline-none focus:text-[#6D4C41] transition"
+                    href="https://linkedin.com/sakshampathak" rel="noopener noreferrer" target="_blank" tabindex="0"><i
+                        class="fab fa-linkedin-in"></i></a>
+                <a aria-label="GitHub" class="hover:text-[#6D4C41] focus:outline-none focus:text-[#6D4C41] transition"
+                    href="https://github.com/parthmax2" rel="noopener noreferrer" target="_blank" tabindex="0"><i
+                        class="fab fa-github"></i></a>
+            </div>
+            <p class="text-center sm:text-left text-sm max-w-xl select-none" style="color: #3e2723">
+                FaceAging AI © developed by <a aria-label="Instagram"
+                    class="hover:text-[#6D4C41] focus:outline-none focus:text-[#6D4C41] transition"
+                    href="https://instagram.com/parthmax_" rel="noopener noreferrer" target="_blank" tabindex="0"><strong>Parthmax</strong></a> 
+            </p>
+        </div>
+    </footer>
+    <script src="/static/script.js"></script>
 </body>
+
 </html>
