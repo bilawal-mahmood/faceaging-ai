@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html class="scroll-smooth" lang="en">
 
 <head>
@@ -5,7 +6,7 @@
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <title>FaceAging AI - AI-Powered Face Age Transformation</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <style>
         html {
@@ -539,61 +540,71 @@
             </button>
         </section>
 
-       
-<!-- TRY IT OUT -->
-<section aria-label="Try FaceAging AI"
-  class="max-w-full mx-auto px-12 sm:px-20 lg:px-28 py-20 scroll-animate"
-  id="tryItOut" tabindex="-1">
+        <!-- TRY IT OUT -->
+        <section aria-label="Try FaceAging AI"
+            class="max-w-full mx-auto px-12 sm:px-20 lg:px-28 py-20 scroll-animate"
+            id="tryItOut" tabindex="-1">
 
-  <form class="space-y-10 max-w-5xl mx-auto" id="uploadForm" enctype="multipart/form-data" novalidate>
+            <form class="space-y-10 max-w-5xl mx-auto" id="uploadForm" enctype="multipart/form-data" novalidate>
 
-    <!-- Upload Box -->
-    <div class="border-2 border-dashed border-[#A1887F] rounded-3xl p-14 text-center bg-[#EFEBE9] shadow-md">
-      <label for="fileInput" class="block text-3xl font-semibold text-[#3E2723] mb-6">
-        Upload Your Face Image
-      </label>
-      <input accept="image/*" class="block mx-auto text-lg mb-5 w-full max-w-4xl" id="fileInput" name="file" required
-        type="file" aria-label="Upload face image" />
-      <p class="text-base text-[#5D4037]">Supported formats: JPG, PNG • Max size: 5MB</p>
-    </div>
+                <!-- Upload Box -->
+                <div class="border-2 border-dashed border-[#A1887F] rounded-3xl p-14 text-center bg-[#EFEBE9] shadow-md">
+                    <label for="fileInput" class="block text-3xl font-semibold text-[#3E2723] mb-6">
+                        Upload Your Face Image
+                    </label>
+                    <input accept="image/*" class="block mx-auto text-lg mb-5 w-full max-w-4xl" id="fileInput" name="file" required
+                        type="file" aria-label="Upload face image" />
+                    <p class="text-base text-[#5D4037]">Supported formats: JPG, PNG • Max size: 5MB</p>
+                </div>
 
-    <!-- Controls Section -->
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-10 max-w-5xl mx-auto">
+                <!-- Controls Section -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-10 max-w-5xl mx-auto">
 
-      <!-- Dropdown -->
-      <div class="w-full sm:w-1/2">
-        <label for="conversion" class="block text-lg font-medium text-[#3E2723] mb-3">
-          Choose Transformation
-        </label>
-        <select id="conversion" name="conversion" required
-          class="w-full px-6 py-4 rounded-3xl border border-[#A1887F] bg-white text-[#3E2723] text-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-[#6D4C41] transition">
-          <option value="young_to_old">Young to Old</option>
-          <option value="old_to_young">Old to Young</option>
-        </select>
-      </div>
+                    <!-- Dropdown -->
+                    <div class="w-full sm:w-1/2">
+                        <label for="conversion" class="block text-lg font-medium text-[#3E2723] mb-3">
+                            Choose Transformation
+                        </label>
+                        <select id="conversion" name="conversion" required
+                            class="w-full px-6 py-4 rounded-3xl border border-[#A1887F] bg-white text-[#3E2723] text-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-[#6D4C41] transition">
+                            <option value="young_to_old">Young to Old</option>
+                            <option value="old_to_young">Old to Young</option>
+                        </select>
+                    </div>
 
-      <!-- Generate Button -->
-      <div class="w-full sm:w-1/3 mt-6 sm:mt-0">
-        <button id="generateBtn" type="submit"
-          class="primary-btn w-full sm:w-auto px-8 py-4 bg-[#6D4C41] text-white font-semibold text-xl rounded-3xl shadow-md hover:bg-[#5D4037] transition focus:outline-none focus:ring-6 focus:ring-[#6D4C41]"
-          aria-label="Generate aged or de-aged face image">
-          Generate
-        </button>
-      </div>
+                    <!-- Generate Button -->
+                    <div class="w-full sm:w-1/3 mt-6 sm:mt-0">
+                        <button id="generateBtn" type="submit"
+                            class="primary-btn w-full sm:w-auto px-8 py-4 bg-[#6D4C41] text-white font-semibold text-xl rounded-3xl shadow-md hover:bg-[#5D4037] transition focus:outline-none focus:ring-6 focus:ring-[#6D4C41]"
+                            aria-label="Generate aged or de-aged face image">
+                            Generate
+                        </button>
+                    </div>
 
-    </div>
-  </form>
+                </div>
+            </form>
 
-  <!-- Result -->
-  <div id="result" class="mt-20 text-center max-w-6xl mx-auto">
-    <h2 class="text-3xl font-bold mb-8 text-[#3e2723]">Result:</h2>
-    <img alt="Result Image showing the face after aging or de-aging transformation"
-      class="mx-auto rounded-3xl shadow-lg max-w-full" id="outputImage" src="#" style="display: none" loading="lazy" />
-  </div>
-</section>
-
-
-
+            <!-- Result -->
+            <div id="result" class="mt-20 text-center max-w-6xl mx-auto">
+                <h2 class="text-3xl font-bold mb-8 text-[#3e2723]">Result:</h2>
+                <div class="flex justify-center gap-8">
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold mb-4">Original</h3>
+                        <img alt="Original uploaded image" class="mx-auto rounded-3xl shadow-lg max-w-full h-64 object-cover" id="originalImage" src="#" style="display: none" loading="lazy" />
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold mb-4">Transformed</h3>
+                        <img alt="Result Image showing the face after aging or de-aging transformation"
+                            class="mx-auto rounded-3xl shadow-lg max-w-full h-64 object-cover" id="outputImage" src="#" style="display: none" loading="lazy" />
+                    </div>
+                </div>
+                <div id="loadingSpinner" class="mt-8 hidden">
+                    <div class="spinner"></div>
+                    <p class="mt-4 text-[#6d4c41]">Processing your image...</p>
+                </div>
+                <div id="errorMessage" class="mt-8 text-red-600 hidden"></div>
+            </div>
+        </section>
 
         <!-- AI INSIGHT PANEL -->
         <section aria-label="AI Insight Panel"
@@ -723,7 +734,7 @@
                 Contact
             </h2>
             <p class="text-center max-w-3xl mx-auto mb-6" style="color: #4e342e">
-                Have questions or want to collaborate with us ? Reach out to us via email or
+                Have questions or want to collaborate with us? Reach out to us via email or
                 social media:
             </p>
             <ul class="flex flex-col sm:flex-row justify-center gap-8 text-lg max-w-3xl mx-auto" style="color: #3e2723">
@@ -769,7 +780,148 @@
             </p>
         </div>
     </footer>
-    <script src="/static/script.js"></script>
+    <script>
+        // Dark mode toggle
+        const darkToggle = document.getElementById('darkToggle');
+        const body = document.body;
+        
+        // Check for saved user preference or use system preference
+        if (localStorage.getItem('darkMode') === 'true' || 
+            (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            body.classList.add('dark');
+            darkToggle.innerHTML = '<i class="fas fa-sun fa-lg"></i>';
+        }
+        
+        darkToggle.style.visibility = 'visible';
+        
+        darkToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            const isDark = body.classList.contains('dark');
+            localStorage.setItem('darkMode', isDark);
+            darkToggle.innerHTML = isDark ? '<i class="fas fa-sun fa-lg"></i>' : '<i class="fas fa-moon fa-lg"></i>';
+        });
+
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+            mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Learn more toggle
+        const learnMoreBtn = document.getElementById('learnMoreBtn');
+        const learnMoreContent = document.getElementById('learnMoreContent');
+        
+        learnMoreBtn.addEventListener('click', () => {
+            const isExpanded = learnMoreBtn.getAttribute('aria-expanded') === 'true';
+            learnMoreBtn.setAttribute('aria-expanded', !isExpanded);
+            learnMoreContent.hidden = !learnMoreContent.hidden;
+            learnMoreContent.classList.toggle('open');
+        });
+
+        // Scroll animations
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.scroll-animate, .fade-in');
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (elementPosition < windowHeight - 100) {
+                    element.classList.add('visible');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('load', animateOnScroll);
+
+        // Form submission
+        const uploadForm = document.getElementById('uploadForm');
+        const generateBtn = document.getElementById('generateBtn');
+        const outputImage = document.getElementById('outputImage');
+        const originalImage = document.getElementById('originalImage');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const errorMessage = document.getElementById('errorMessage');
+        const fileInput = document.getElementById('fileInput');
+        
+        // Preview uploaded image
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    originalImage.src = event.target.result;
+                    originalImage.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(uploadForm);
+            const file = formData.get('file');
+            
+            if (!file || file.size === 0) {
+                showError('Please select an image file');
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showError('File size should be less than 5MB');
+                return;
+            }
+            
+            try {
+                // Show loading state
+                generateBtn.disabled = true;
+                loadingSpinner.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+                outputImage.style.display = 'none';
+                
+                const response = await fetch('/convert/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(error || 'Failed to process image');
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                if (data.image) {
+                    outputImage.src = `data:image/png;base64,${data.image}`;
+                    outputImage.style.display = 'block';
+                }
+            } catch (error) {
+                showError(error.message || 'An error occurred while processing your image');
+                console.error('Error:', error);
+            } finally {
+                generateBtn.disabled = false;
+                loadingSpinner.classList.add('hidden');
+            }
+        });
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        // Hero button scroll to form
+        document.getElementById('uploadBtnHero').addEventListener('click', () => {
+            document.getElementById('tryItOut').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
 </body>
 
 </html>
